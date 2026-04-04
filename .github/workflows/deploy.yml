@@ -1,9 +1,14 @@
 name: Deploy to EC2
 
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   test:
@@ -25,12 +30,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Lint (if script exists)
-        run: |
-          if npm run | grep -q " lint"; then
-            npm run lint
-          else
-            echo "No lint script found. Skipping lint."
-          fi
+        run: npm run lint --if-present
 
   build-and-push:
     runs-on: ubuntu-latest
@@ -76,6 +76,7 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/pruthvi-collab:latest
+            ${{ secrets.DOCKER_USERNAME }}/pruthvi-collab:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -87,9 +88,34 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
           script: |
-            cd /home/ubuntu/app
-            docker compose --env-file .env.production pull
+            set -e
+
+            if [ -f /home/ubuntu/app/docker-compose.yml ]; then
+              APP_DIR=/home/ubuntu/app
+            elif [ -f /home/ubuntu/app/app/docker-compose.yml ]; then
+              APP_DIR=/home/ubuntu/app/app
+            else
+              echo "docker-compose.yml not found in /home/ubuntu/app or /home/ubuntu/app/app"
+              exit 1
+            fi
+
+            cd "$APP_DIR"
+            echo "Deploying from: $APP_DIR"
+
+            if [ ! -f .env.production ]; then
+              echo ".env.production is missing"
+              exit 1
+            fi
+
+            if ! grep -q '^DOCKER_USERNAME=' .env.production; then
+              echo "DOCKER_USERNAME is missing in .env.production"
+              exit 1
+            fi
+
+            docker compose --env-file .env.production pull nextjs-app collab-server nginx
             docker compose --env-file .env.production up -d --remove-orphans
-            docker system prune -f
+            docker image prune -f
             docker compose --env-file .env.production ps
+            docker compose --env-file .env.production logs --tail=60 nextjs-app collab-server || true
