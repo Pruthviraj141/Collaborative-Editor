@@ -137,7 +137,7 @@ export function EditorToolbar({ editor, canWrite, onAiDiagram }: EditorToolbarPr
 
   return (
     <TooltipProvider delayDuration={150}>
-      <div className="sticky top-2 z-20 flex flex-wrap items-center gap-1 rounded-xl border border-border/80 bg-background/90 p-2 shadow-sm backdrop-blur">
+      <div className="hide-scrollbar sticky top-2 z-20 flex items-center gap-1 overflow-x-auto rounded-xl border border-border/80 bg-background/90 p-2 shadow-sm backdrop-blur">
         {actions.map((action, index) => (
           <div key={action.key} className="flex items-center">
             <Tooltip>

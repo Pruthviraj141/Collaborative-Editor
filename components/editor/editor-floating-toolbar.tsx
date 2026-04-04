@@ -23,6 +23,7 @@ export function EditorFloatingToolbar({ editor, canWrite }: EditorFloatingToolba
           size="icon"
           onClick={() => editor.chain().focus().toggleBold().run()}
           className="h-8 w-8"
+          aria-label="Bold"
         >
           <Bold className="h-3.5 w-3.5" />
         </Button>
@@ -31,10 +32,11 @@ export function EditorFloatingToolbar({ editor, canWrite }: EditorFloatingToolba
           size="icon"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className="h-8 w-8"
+          aria-label="Italic"
         >
           <Italic className="h-3.5 w-3.5" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => editor.chain().focus().insertDiagram().run()} className="h-8 w-8">
+        <Button variant="ghost" size="icon" onClick={() => editor.chain().focus().insertDiagram().run()} className="h-8 w-8" aria-label="Insert diagram">
           <PenSquare className="h-3.5 w-3.5" />
         </Button>
       </div>

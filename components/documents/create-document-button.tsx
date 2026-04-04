@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 
@@ -35,19 +36,22 @@ export function CreateDocumentButton({ workspaceId }: CreateDocumentButtonProps)
       };
 
       if (!response.ok || !payload.document?.id) {
+        toast.error("Unable to create document. Please try again.");
         setIsCreating(false);
         return;
       }
 
+      toast.success("Document created successfully.");
       router.push(`/editor?docId=${payload.document.id}`);
       router.refresh();
     } catch {
+      toast.error("Unable to create document. Please try again.");
       setIsCreating(false);
     }
   };
 
   return (
-    <Button type="button" onClick={() => void createDocument()} disabled={isCreating} className="h-10 rounded-lg px-4">
+    <Button type="button" onClick={() => void createDocument()} disabled={isCreating} className="h-10 rounded-lg px-4 disabled:opacity-50">
       {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
       {isCreating ? "Creating..." : "New document"}
     </Button>

@@ -31,7 +31,16 @@ export function ActiveCollaborators({ users }: ActiveCollaboratorsProps) {
           </span>
         ))}
       </div>
+      <div className="hidden items-center gap-1 md:flex">
+        {visible.map((user) => (
+          <span key={`${user.id}-chip`} className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+            <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: user.color }} />
+            {user.name}
+          </span>
+        ))}
+      </div>
       {overflow > 0 ? <span className="text-xs text-muted-foreground">+{overflow} more</span> : null}
+      <span className="hidden text-xs text-muted-foreground sm:inline">{users.length} active</span>
     </div>
   );
 }

@@ -13,13 +13,13 @@ interface DocumentListProps {
 export function DocumentList({ documents, workspaceId }: DocumentListProps) {
   if (documents.length === 0) {
     return (
-      <Card className="rounded-2xl border border-border/70 shadow-sm">
+      <Card className="rounded-2xl border border-border/70 shadow-sm animate-in fade-in-0 duration-300">
         <CardHeader className="items-center py-12 text-center">
-          <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <FileText className="h-5 w-5" />
+          <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <FileText className="h-6 w-6" />
           </div>
-          <CardTitle>No documents yet</CardTitle>
-          <CardDescription>Create your first document to start collaborating.</CardDescription>
+          <CardTitle className="text-xl">No documents yet</CardTitle>
+          <CardDescription>Create your first document and start collaborating instantly.</CardDescription>
           <div className="pt-3">
             <CreateDocumentButton workspaceId={workspaceId} />
           </div>
@@ -29,17 +29,19 @@ export function DocumentList({ documents, workspaceId }: DocumentListProps) {
   }
 
   return (
-    <Card className="rounded-2xl border border-border/70 shadow-sm">
+    <Card className="rounded-2xl border border-border/70 shadow-sm animate-in fade-in-0 duration-300">
       <CardHeader>
         <CardTitle className="text-xl">Recent documents</CardTitle>
         <CardDescription>Pick up where you left off.</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-3 p-4 md:grid-cols-2">
-        {documents.map((doc) => (
+      <CardContent className="grid grid-cols-1 gap-3 p-4 md:grid-cols-2 xl:grid-cols-3">
+        {documents.map((doc, index) => (
           <Link
             key={doc.id}
             href={`/editor?docId=${doc.id}`}
-            className="group rounded-xl border border-border/70 bg-background p-4 transition-all duration-150 hover:-translate-y-0.5 hover:border-border hover:shadow-md"
+            className={`group rounded-xl border border-border/70 bg-background p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-border hover:shadow-md animate-in fade-in-0 ${
+              ["delay-0", "delay-75", "delay-100", "delay-150", "delay-200", "delay-300"][index % 6]
+            }`}
           >
             <div className="mb-3 flex items-center justify-between">
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">

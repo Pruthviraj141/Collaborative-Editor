@@ -10,6 +10,7 @@ import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import { jsPDF } from "jspdf";
 import * as Y from "yjs";
+import { toast } from "sonner";
 
 import { ActiveCollaborators } from "@/components/editor/active-collaborators";
 import { EditorFloatingToolbar } from "@/components/editor/editor-floating-toolbar";
@@ -442,6 +443,7 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
         setIsDirty(false);
       } else {
         setStatus("error");
+        toast.error("Failed to save document. Please try again.");
       }
     };
 
@@ -498,9 +500,11 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
       setStatus("saved");
       setIsDirty(false);
       setManualSaveState("saved");
+      toast.success("Document saved");
     } else {
       setStatus("error");
       setManualSaveState("idle");
+      toast.error("Failed to save document.");
       return;
     }
 
@@ -638,13 +642,15 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
     try {
       const copied = await copyText(shareUrl);
       if (!copied) {
+        toast.error("Copy failed. Please copy manually.");
         return;
       }
 
       setCopied(true);
       setTimeout(() => setCopied(false), 1200);
+      toast.success("Share link copied");
     } catch {
-      // no-op: clipboard may be blocked in insecure/non-permitted contexts
+      toast.error("Copy failed. Please copy manually.");
     }
   }, [shareUrl]);
 
@@ -704,9 +710,15 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
   if (!editor && !isLoading) {
     if (collaboration.enabled && !collaboration.isReady) {
       return (
-        <Card className="p-6">
-          <p className="text-sm text-muted-foreground">Connecting collaboration room...</p>
-        </Card>
+        <section className="space-y-4">
+          <div className="loading-progress h-1 w-full rounded-full bg-muted/70" />
+          <Card className="space-y-4 p-6">
+            <div className="skeleton h-8 w-64 rounded-md" />
+            <div className="skeleton h-4 w-80 max-w-full rounded-md" />
+            <div className="skeleton h-4 w-72 max-w-full rounded-md" />
+            <div className="skeleton h-56 w-full rounded-xl" />
+          </Card>
+        </section>
       );
     }
 

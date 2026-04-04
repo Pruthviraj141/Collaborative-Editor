@@ -1,13 +1,13 @@
 "use client";
 
 import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import dynamic from "next/dynamic";
 import { Copy, Download, Expand, FileImage, FileType2, LocateFixed, PenSquare, Plus, RefreshCw, Settings2, Trash2, Type } from "lucide-react";
 import { NodeViewWrapper } from "@tiptap/react";
 import type { NodeViewProps } from "@tiptap/react";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types/types";
 import type * as Y from "yjs";
 
-import { DiagramCanvas } from "@/components/diagram/diagram-canvas";
 import { DIAGRAM_ORIGINS, getDiagramContent, setDiagramContent } from "@/lib/collab/diagram-state";
 import { alignElements, distributeElements, enrichArrowBindings, extractArrowConnections } from "@/lib/diagram/arrow-bindings";
 import { DIAGRAM_TEMPLATES, getDiagramTemplate, type DiagramTemplateKey } from "@/lib/diagram/templates";
@@ -24,6 +24,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { safeUuid } from "@/lib/utils";
 import { DEFAULT_DIAGRAM_LAYOUT_SETTINGS, type DiagramLayoutSettings } from "@/types/diagram";
+
+const DiagramCanvas = dynamic(
+  () => import("@/components/diagram/diagram-canvas").then((mod) => mod.DiagramCanvas),
+  {
+    ssr: false,
+    loading: () => <div className="skeleton h-full min-h-[320px] w-full rounded-lg" />
+  }
+);
 
 interface DiagramNodeViewProps {
   props: NodeViewProps;
@@ -627,7 +635,7 @@ export function DiagramNodeView({ props, yDoc, canEdit }: DiagramNodeViewProps) 
                 </DropdownMenuSub>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={handleDuplicate}>
+            <Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={handleDuplicate} aria-label="Duplicate diagram block">
               <PenSquare className="h-3.5 w-3.5" />
             </Button>
             <Button
@@ -636,9 +644,12 @@ export function DiagramNodeView({ props, yDoc, canEdit }: DiagramNodeViewProps) 
               size="icon"
               className="h-7 w-7 text-destructive hover:text-destructive"
               onClick={() => {
-                props.deleteNode();
+                if (window.confirm("Delete this diagram block? This action cannot be undone.")) {
+                  props.deleteNode();
+                }
               }}
               disabled={!canEdit}
+              aria-label="Delete diagram block"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </Button>

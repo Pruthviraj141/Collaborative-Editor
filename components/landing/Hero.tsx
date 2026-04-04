@@ -72,9 +72,9 @@ export function Hero() {
 
         <h1 className="hero-anim hero-delay-180 mt-7 text-[clamp(3rem,7vw,5.5rem)] font-extrabold leading-[1.05] tracking-[-0.03em] text-white">
           <span className="block">The editor where</span>
-          <span className="mt-2 block" style={{ minHeight: "1.2em" }}>
+          <span className="mt-2 block min-h-[1.2em]">
             <span className="hero-typed-gradient">{typedText || "\u00A0"}</span>
-            <span className="hero-cursor" style={{ marginLeft: "4px" }}>
+            <span className="hero-cursor ml-1">
               |
             </span>
             <span className="sr-only">{currentPhrase}</span>
@@ -106,20 +106,15 @@ export function Hero() {
         <div className="hero-anim hero-delay-680 mt-8 flex items-center justify-center gap-3">
           <div className="flex items-center">
             {[
-              { initials: "AK", color: "#7c3aed" },
-              { initials: "RS", color: "#0891b2" },
-              { initials: "MT", color: "#059669" },
-              { initials: "JL", color: "#d97706" },
-              { initials: "PW", color: "#dc2626" }
+              { initials: "AK", colorClass: "bg-violet-600", overlapClass: "ml-0" },
+              { initials: "RS", colorClass: "bg-cyan-600", overlapClass: "-ml-2.5" },
+              { initials: "MT", colorClass: "bg-emerald-600", overlapClass: "-ml-2.5" },
+              { initials: "JL", colorClass: "bg-amber-600", overlapClass: "-ml-2.5" },
+              { initials: "PW", colorClass: "bg-red-600", overlapClass: "-ml-2.5" }
             ].map((avatar, index) => (
               <div
                 key={avatar.initials}
-                className="flex h-8 w-8 items-center justify-center rounded-full border-2 text-[10px] font-semibold text-white"
-                style={{
-                  marginLeft: index === 0 ? "0px" : "-10px",
-                  backgroundColor: avatar.color,
-                  borderColor: "#080812"
-                }}
+                className={`flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#080812] text-[10px] font-semibold text-white ${avatar.colorClass} ${index === 0 ? "ml-0" : avatar.overlapClass}`}
               >
                 {avatar.initials}
               </div>

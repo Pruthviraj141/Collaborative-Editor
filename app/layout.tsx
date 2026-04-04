@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Toaster } from "sonner";
 
 import { SessionBootstrap } from "@/components/layout/session-bootstrap";
 
@@ -16,7 +17,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SessionBootstrap>{children}</SessionBootstrap>
+        <SessionBootstrap>
+          <div className="app-page-transition">{children}</div>
+          <Toaster richColors position="top-right" closeButton />
+        </SessionBootstrap>
       </body>
     </html>
   );
