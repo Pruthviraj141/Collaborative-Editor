@@ -6,6 +6,7 @@ import * as Y from "yjs";
 
 import { createPresence } from "@/lib/collab/presence";
 import { publicEnv } from "@/lib/env";
+import { safeUuid } from "@/lib/utils";
 import type { CollaboratorPresence, EditorSyncStatus } from "@/types/editor";
 
 type CollaborationStatus = Extract<EditorSyncStatus, "connected" | "reconnecting" | "offline" | "syncing" | "error">;
@@ -53,7 +54,7 @@ function encodeUint8ArrayToBase64(input: Uint8Array) {
 
 function resolveSessionSeed() {
   if (typeof window === "undefined") {
-    return crypto.randomUUID();
+    return safeUuid();
   }
 
   const existing = window.sessionStorage.getItem(SESSION_KEY);
@@ -61,7 +62,7 @@ function resolveSessionSeed() {
     return existing;
   }
 
-  const next = crypto.randomUUID();
+  const next = safeUuid();
   window.sessionStorage.setItem(SESSION_KEY, next);
   return next;
 }
@@ -266,7 +267,7 @@ export function useCollaboration({ documentId, canWrite }: UseCollaborationInput
               .map((state) => state.user as { id?: string; name?: string; color?: string } | undefined)
               .filter(Boolean)
               .map((item) => ({
-                id: item?.id ?? crypto.randomUUID(),
+                id: item?.id ?? safeUuid(),
                 name: item?.name ?? "Guest",
                 color: item?.color ?? "#64748b"
               }));

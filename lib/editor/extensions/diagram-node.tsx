@@ -14,6 +14,7 @@ import {
   listDiagramBlockIds,
   setDiagramContent
 } from "@/lib/collab/diagram-state";
+import { safeUuid } from "@/lib/utils";
 import { DEFAULT_DIAGRAM_LAYOUT_SETTINGS } from "@/types/diagram";
 
 interface DiagramNodeOptions {
@@ -80,7 +81,7 @@ export const DiagramNode = Node.create<DiagramNodeOptions>({
             return false;
           }
 
-          const blockId = crypto.randomUUID();
+          const blockId = safeUuid();
 
           if (this.options.yDoc && !getDiagramContent(this.options.yDoc, blockId)) {
             setDiagramContent(this.options.yDoc, blockId, {

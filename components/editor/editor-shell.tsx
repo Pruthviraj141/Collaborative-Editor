@@ -27,6 +27,7 @@ import { DiagramNode } from "@/lib/editor/extensions/diagram-node";
 import { useDocument } from "@/hooks/use-document";
 import { useEditorState } from "@/hooks/use-editor-state";
 import { publicEnv } from "@/lib/env";
+import { safeUuid } from "@/lib/utils";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 
 interface EditorShellProps {
@@ -272,7 +273,7 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
       return;
     }
 
-    const blockId = crypto.randomUUID();
+    const blockId = safeUuid();
 
     editor
       .chain()

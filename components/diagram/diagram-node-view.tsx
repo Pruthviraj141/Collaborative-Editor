@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { safeUuid } from "@/lib/utils";
 import { DEFAULT_DIAGRAM_LAYOUT_SETTINGS, type DiagramLayoutSettings } from "@/types/diagram";
 
 interface DiagramNodeViewProps {
@@ -61,7 +62,7 @@ export function DiagramNodeView({ props, yDoc, canEdit }: DiagramNodeViewProps) 
       return;
     }
 
-    const newBlockId = crypto.randomUUID();
+    const newBlockId = safeUuid();
     const sourceScene = getDiagramContent(yDoc, blockId);
 
     setDiagramContent(
