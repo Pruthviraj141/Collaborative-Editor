@@ -74,6 +74,30 @@ async function loadImageSize(dataUrl: string) {
   });
 }
 
+async function copyText(text: string) {
+  if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return true;
+  }
+
+  if (typeof document === "undefined") {
+    return false;
+  }
+
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.setAttribute("readonly", "");
+  textArea.style.position = "fixed";
+  textArea.style.left = "-9999px";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  const copied = document.execCommand("copy");
+  document.body.removeChild(textArea);
+  return copied;
+}
+
 export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: EditorShellProps) {
   const { document, isLoading, isSaving, error: documentError, save } = useDocument(documentId);
   const collaboration = useCollaboration({ documentId, canWrite });
@@ -541,9 +565,17 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
       return;
     }
 
-    await navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1200);
+    try {
+      const copied = await copyText(shareUrl);
+      if (!copied) {
+        return;
+      }
+
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch {
+      // no-op: clipboard may be blocked in insecure/non-permitted contexts
+    }
   }, [shareUrl]);
 
   const resolvedStatus = useMemo(() => {
