@@ -1,10 +1,9 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-
+import type { getSupabaseAdminClient } from "@/lib/supabase/admin";
+import type { getSupabaseServerClient } from "@/lib/supabase/server";
 import { documentIdSchema } from "@/lib/validators/document";
 import type { DocumentRecord } from "@/types/document";
-import type { Database } from "@/types/supabase";
 
-type DbClient = SupabaseClient<Database, "public", any>;
+type DbClient = ReturnType<typeof getSupabaseServerClient> | ReturnType<typeof getSupabaseAdminClient>;
 
 export class DatabaseError extends Error {
   readonly status: number;
