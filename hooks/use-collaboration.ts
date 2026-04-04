@@ -232,6 +232,12 @@ export function useCollaboration({ documentId, canWrite }: UseCollaborationInput
           token: tokenData.token,
           preserveConnection: true,
           onConnect: () => {
+            if (localProvider?.awareness) {
+              localProvider.awareness.setLocalState({
+                ...(localProvider.awareness.getLocalState() ?? {}),
+                user: presence
+              });
+            }
             setStatus("connected");
             setError(null);
           },
@@ -272,13 +278,20 @@ export function useCollaboration({ documentId, canWrite }: UseCollaborationInput
                 color: item?.color ?? "#64748b"
               }));
 
+            if (!next.some((item) => item.id === presence.id)) {
+              next.push(presence);
+            }
+
             const deduped = [...new Map(next.map((item) => [item.id, item])).values()];
             setCollaborators(deduped);
           }
         });
 
         if (localProvider.awareness) {
-          localProvider.awareness.setLocalStateField("user", presence);
+          localProvider.awareness.setLocalState({
+            ...(localProvider.awareness.getLocalState() ?? {}),
+            user: presence
+          });
         }
 
         if (disposed) {

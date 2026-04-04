@@ -9,6 +9,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import { jsPDF } from "jspdf";
+import * as Y from "yjs";
 
 import { ActiveCollaborators } from "@/components/editor/active-collaborators";
 import { EditorFloatingToolbar } from "@/components/editor/editor-floating-toolbar";
@@ -98,6 +99,16 @@ async function copyText(text: string) {
   return copied;
 }
 
+function encodeUint8ArrayToBase64(input: Uint8Array) {
+  let binary = "";
+
+  for (let index = 0; index < input.length; index += 1) {
+    binary += String.fromCharCode(input[index]);
+  }
+
+  return window.btoa(binary);
+}
+
 export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: EditorShellProps) {
   const { document, isLoading, isSaving, error: documentError, save } = useDocument(documentId);
   const collaboration = useCollaboration({ documentId, canWrite });
@@ -184,7 +195,9 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
       return;
     }
 
-    setTitle(document.title);
+    if (!collaboration.enabled) {
+      setTitle(document.title);
+    }
 
     if (!collaboration.enabled) {
       setContent(document.content);
@@ -193,6 +206,32 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
     setIsDirty(false);
     setStatus(canEdit ? "saved" : "read-only");
   }, [canEdit, collaboration.enabled, document, setContent, setIsDirty, setStatus, setTitle]);
+
+  useEffect(() => {
+    if (!collaboration.enabled || !collaboration.yDoc) {
+      return;
+    }
+
+    const titleMap = collaboration.yDoc.getMap<string>("document-meta");
+    const defaultTitle = document?.title?.trim() || publicEnv.NEXT_PUBLIC_EDITOR_DEFAULT_TITLE;
+
+    const applyTitle = () => {
+      const nextTitle = (titleMap.get("title") ?? "").trim() || defaultTitle;
+      setTitle(nextTitle);
+    };
+
+    const current = (titleMap.get("title") ?? "").trim();
+    if (!current) {
+      titleMap.set("title", defaultTitle);
+    }
+
+    applyTitle();
+    titleMap.observe(applyTitle);
+
+    return () => {
+      titleMap.unobserve(applyTitle);
+    };
+  }, [collaboration.enabled, collaboration.yDoc, document?.title, setTitle]);
 
   const editor = useEditor(
     {
@@ -242,8 +281,9 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
           const firstLine = instance.state.doc.textBetween(0, instance.state.doc.content.size, "\n", "\n").split("\n")[0]?.trim() ?? "";
           const canAutoTitle = canSaveMetadata && (titleRef.current.trim() === "" || titleRef.current === publicEnv.NEXT_PUBLIC_EDITOR_DEFAULT_TITLE);
 
-          if (canAutoTitle && firstLine.length > 0) {
-            setTitle(firstLine.slice(0, 90));
+          if (canAutoTitle && firstLine.length > 0 && collaboration.yDoc) {
+            const titleMap = collaboration.yDoc.getMap<string>("document-meta");
+            titleMap.set("title", firstLine.slice(0, 90));
             setIsDirty(true);
           }
 
@@ -383,10 +423,14 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
     let cancelled = false;
 
     const persist = async () => {
+      const collaborativeTitle = collaboration.enabled && collaboration.yDoc
+        ? (collaboration.yDoc.getMap<string>("document-meta").get("title") ?? state.title)
+        : state.title;
+
       const saved = await save({
         id: documentId,
-        title: state.title,
-        content: editor?.getHTML() ?? state.content
+        title: collaborativeTitle,
+        content: collaboration.enabled ? undefined : (editor?.getHTML() ?? state.content)
       });
 
       if (cancelled) {
@@ -406,7 +450,7 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
     return () => {
       cancelled = true;
     };
-  }, [canSaveMetadata, documentId, editor, save, setIsDirty, setStatus, state.content, state.isDirty, state.title]);
+  }, [canSaveMetadata, collaboration.enabled, collaboration.yDoc, documentId, editor, save, setIsDirty, setStatus, state.content, state.isDirty, state.title]);
 
   const onManualSave = useCallback(async () => {
     if (!documentId || !canSaveMetadata) {
@@ -415,11 +459,37 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
 
     setManualSaveState("saving");
 
+    if (collaboration.enabled && collaboration.yDoc) {
+      const update = Y.encodeStateAsUpdate(collaboration.yDoc);
+      const yjsStateBase64 = encodeUint8ArrayToBase64(update);
+
+      const persistResponse = await fetch(`/api/documents/${encodeURIComponent(documentId)}/yjs-state`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          yjsStateBase64,
+          htmlSnapshot: editor?.getHTML() ?? null
+        })
+      });
+
+      if (!persistResponse.ok) {
+        setStatus("error");
+        setManualSaveState("idle");
+        return;
+      }
+    }
+
+    const collaborativeTitle = collaboration.enabled && collaboration.yDoc
+      ? (collaboration.yDoc.getMap<string>("document-meta").get("title") ?? state.title)
+      : state.title;
+
     const saved = await save(
       {
         id: documentId,
-        title: state.title,
-        content: editor?.getHTML() ?? state.content
+        title: collaborativeTitle,
+        content: collaboration.enabled ? undefined : (editor?.getHTML() ?? state.content)
       },
       { immediate: true }
     );
@@ -435,7 +505,7 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
     }
 
     setTimeout(() => setManualSaveState("idle"), 1200);
-  }, [canSaveMetadata, documentId, editor, save, setIsDirty, setStatus, state.content, state.title]);
+  }, [canSaveMetadata, collaboration.enabled, collaboration.yDoc, documentId, editor, save, setIsDirty, setStatus, state.content, state.title]);
 
   const onDownloadPdf = useCallback(async () => {
     if (!editor || isExportingPdf) {
@@ -654,7 +724,12 @@ export function EditorShell({ documentId, canWrite, canSaveMetadata = false }: E
           <Input
             value={state.title}
             onChange={(event) => {
-              setTitle(event.target.value);
+              if (collaboration.enabled && collaboration.yDoc) {
+                const titleMap = collaboration.yDoc.getMap<string>("document-meta");
+                titleMap.set("title", event.target.value);
+              } else {
+                setTitle(event.target.value);
+              }
               setIsDirty(true);
               setStatus(canEdit ? "syncing" : "read-only");
             }}
