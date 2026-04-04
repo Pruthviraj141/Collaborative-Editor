@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { assertCanWrite, getServerSessionUser } from "@/lib/auth";
 import { DatabaseError, getDocumentById, updateDocumentMeta } from "@/lib/db/documents";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { updateDocumentSchema } from "@/lib/validators/document";
 
 interface Params {
@@ -12,7 +12,7 @@ interface Params {
 }
 
 export async function GET(_: Request, { params }: Params) {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
   const user = await getServerSessionUser();
 
   if (!user) {
@@ -20,6 +20,7 @@ export async function GET(_: Request, { params }: Params) {
   }
 
   try {
+    console.info("[documents:get]", { documentId: params.id, userId: user.id });
     const document = await getDocumentById(supabase, params.id);
     return NextResponse.json({ document }, { status: 200 });
   } catch (cause) {
@@ -30,7 +31,7 @@ export async function GET(_: Request, { params }: Params) {
 }
 
 export async function PATCH(request: Request, { params }: Params) {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
   const user = await getServerSessionUser();
   const userId = user?.id;
 
@@ -51,6 +52,7 @@ export async function PATCH(request: Request, { params }: Params) {
       return NextResponse.json({ error: "Invalid update payload" }, { status: 400 });
     }
 
+    console.info("[documents:patch]", { documentId: params.id, userId });
     const document = await updateDocumentMeta(supabase, {
       id: params.id,
       title: parsed.data.title,

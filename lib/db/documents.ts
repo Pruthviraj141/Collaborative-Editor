@@ -1,6 +1,10 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { documentIdSchema } from "@/lib/validators/document";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
 import type { DocumentRecord } from "@/types/document";
+import type { Database } from "@/types/supabase";
+
+type DbClient = SupabaseClient<Database>;
 
 export class DatabaseError extends Error {
   readonly status: number;
@@ -12,7 +16,7 @@ export class DatabaseError extends Error {
 }
 
 export async function listDocuments(
-  client: ReturnType<typeof getSupabaseServerClient>,
+  client: DbClient,
   args: { workspaceId?: string; userId?: string | null }
 ) {
   let query = client
@@ -40,7 +44,7 @@ export async function listDocuments(
   return data satisfies DocumentRecord[];
 }
 
-export async function getDocumentById(client: ReturnType<typeof getSupabaseServerClient>, id: string) {
+export async function getDocumentById(client: DbClient, id: string) {
   const parsed = documentIdSchema.safeParse(id);
   if (!parsed.success) {
     throw new DatabaseError("Invalid document id", 400);
@@ -65,7 +69,7 @@ export async function getDocumentById(client: ReturnType<typeof getSupabaseServe
 }
 
 export async function createDocument(
-  client: ReturnType<typeof getSupabaseServerClient>,
+  client: DbClient,
   input: {
     title: string;
     content: string;
@@ -94,7 +98,7 @@ export async function createDocument(
 }
 
 export async function updateDocumentMeta(
-  client: ReturnType<typeof getSupabaseServerClient>,
+  client: DbClient,
   input: {
     id: string;
     title?: string;
@@ -151,7 +155,7 @@ export async function updateDocumentMeta(
 }
 
 export async function createVersion(
-  client: ReturnType<typeof getSupabaseServerClient>,
+  client: DbClient,
   input: {
     documentId: string;
     contentSnapshot: string;
