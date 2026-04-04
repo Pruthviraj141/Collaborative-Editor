@@ -1,0 +1,24 @@
+{
+  "name": "live-editor-collaboration-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@hocuspocus/server": "^2.15.2",
+    "@supabase/supabase-js": "^2.100.1",
+    "dotenv": "^17.3.1",
+    "jose": "^5.9.6",
+    "yjs": "^13.6.27",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.2"
+  }
+}

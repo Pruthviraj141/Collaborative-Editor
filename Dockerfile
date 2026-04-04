@@ -1,0 +1,54 @@
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY --from=deps /app/node_modules ./node_modules
+RUN npm ci
+COPY . .
+
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_HOCUSPOCUS_URL
+ARG NEXT_PUBLIC_WS_URL
+ARG NEXT_PUBLIC_SOCKET_URL
+ARG NEXT_PUBLIC_EDITOR_DEFAULT_TITLE
+ARG NEXT_PUBLIC_ALLOW_GUEST_WRITE
+ARG NEXT_PUBLIC_DEFAULT_WORKSPACE_ID
+
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+ENV NEXT_PUBLIC_HOCUSPOCUS_URL=${NEXT_PUBLIC_HOCUSPOCUS_URL}
+ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+ENV NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL}
+ENV NEXT_PUBLIC_EDITOR_DEFAULT_TITLE=${NEXT_PUBLIC_EDITOR_DEFAULT_TITLE}
+ENV NEXT_PUBLIC_ALLOW_GUEST_WRITE=${NEXT_PUBLIC_ALLOW_GUEST_WRITE}
+ENV NEXT_PUBLIC_DEFAULT_WORKSPACE_ID=${NEXT_PUBLIC_DEFAULT_WORKSPACE_ID}
+
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+RUN addgroup -S nodejs -g 1001 \
+  && adduser -S nextjs -u 1001 -G nodejs \
+  && apk add --no-cache curl
+
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
+
+CMD ["node", "server.js"]

@@ -1,0 +1,29 @@
+# Dependency and build outputs
+node_modules
+**/node_modules
+.next
+out
+dist
+build
+
+# VCS and CI metadata
+.git
+.github
+
+# Docs and local notes
+*.md
+!README.md
+!package*.json
+
+# Secrets and local env
+.env*
+
+# Deployment-only files not required in app image
+docker-compose*.yml
+nginx/
+scripts/
+
+# Misc
+coverage/
+.DS_Store
+*.log

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Google Login Debug</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body style="font-family: Arial; text-align:center; margin-top:80px;">
+
+<h1>🔍 Google Sign-In Debug Tool</h1>
+
+<p id="status">Checking...</p>
+
+<div id="g_id_onload"
+     data-client_id="722650725912-ujik8co02rqordaui4uf9ofgsl1gnssj.apps.googleusercontent.com"
+     data-callback="handleCredentialResponse"
+     data-auto_prompt="false">
+</div>
+
+<div class="g_id_signin" data-size="large"></div>
+
+<script>
+// Step 1: Check if script loaded
+setTimeout(() => {
+    document.getElementById("status").innerHTML = "✅ Google script loaded";
+}, 1000);
+
+// Step 2: Handle login
+function handleCredentialResponse(response) {
+    document.getElementById("status").innerHTML = "✅ Login Success";
+
+    try {
+        const data = JSON.parse(atob(response.credential.split('.')[1]));
+
+        document.body.innerHTML += `
+            <h2>🎉 User Info</h2>
+            <p><b>Name:</b> ${data.name}</p>
+            <p><b>Email:</b> ${data.email}</p>
+        `;
+    } catch (e) {
+        document.body.innerHTML += "<p>❌ Token decode failed</p>";
+    }
+}
+
+// Step 3: Catch global errors
+window.onerror = function(message) {
+    document.getElementById("status").innerHTML = "❌ Error: " + message;
+};
+
+// Step 4: Console debug
+console.log("PAGE LOADED");
+</script>
+
+</body>
+</html>
