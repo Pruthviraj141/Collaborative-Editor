@@ -4,7 +4,7 @@ import { documentIdSchema } from "@/lib/validators/document";
 import type { DocumentRecord } from "@/types/document";
 import type { Database } from "@/types/supabase";
 
-type DbClient = SupabaseClient<Database>;
+type DbClient = SupabaseClient<Database, "public", any>;
 
 export class DatabaseError extends Error {
   readonly status: number;
