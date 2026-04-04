@@ -67,6 +67,10 @@ jobs:
             NEXT_PUBLIC_EDITOR_DEFAULT_TITLE=${{ secrets.NEXT_PUBLIC_EDITOR_DEFAULT_TITLE }}
             NEXT_PUBLIC_ALLOW_GUEST_WRITE=${{ secrets.NEXT_PUBLIC_ALLOW_GUEST_WRITE }}
             NEXT_PUBLIC_DEFAULT_WORKSPACE_ID=${{ secrets.NEXT_PUBLIC_DEFAULT_WORKSPACE_ID }}
+            SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+            SUPABASE_DB_URL=${{ secrets.SUPABASE_DB_URL }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            DIRECT_URL=${{ secrets.DIRECT_URL }}
 
       - name: Build and push collaboration image
         uses: docker/build-push-action@v6
