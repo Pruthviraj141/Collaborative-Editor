@@ -121,4 +121,98 @@ Some parts of this project were built with assistance from **Codex** during deve
 
 ## License
 
+<<<<<<< HEAD
 Package metadata currently uses the **ISC** license.
+=======
+2) Start the dev stack:
+
+```bash
+docker compose -f docker-compose.dev.yml up --build
+```
+
+3) Open:
+- App: `http://localhost:3000`
+- Collaboration server: `ws://localhost:1234`
+
+---
+
+## 🔐 Environment
+
+Use these templates:
+- `.env.example` (local/dev)
+- `.env.production.example` (production)
+- `collaboration-server/.env.example` (collab server)
+
+Keep secrets private. Never commit real credentials.
+
+---
+
+## 📦 Production Deployment
+
+Production stack includes:
+- `nextjs-app` container
+- `collab-server` container
+- `nginx` reverse proxy + TLS termination
+
+See full guide: **DEPLOYMENT.md**
+
+---
+
+## 🧪 Useful Scripts
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+npm run typecheck
+npm run collab:dev
+npm run collab:build
+npm run collab:start
+```
+
+---
+
+## 🤖 AI Used
+
+This project was created with help from **Codex**.
+
+---
+
+## 📁 Project Structure (high-level)
+
+```text
+app/                    Next.js App Router pages and API routes
+components/             Reusable UI/editor/auth components
+hooks/                  Collaboration/editor/document hooks
+lib/                    Auth, DB, env, collab, diagram, utilities
+collaboration-server/   Hocuspocus/Yjs collaboration backend
+supabase/migrations/    SQL schema and RLS migrations
+nginx/                  Reverse proxy and SSL config
+scripts/                Deployment and server setup scripts
+```
+
+---
+
+## 📌 Roadmap Ideas
+
+- Version history UI and restore flow
+- More export formats and templates
+- Presence analytics and session replay
+- Better AI diagram style presets
+
+---
+
+## 📝 License
+
+Current package license field is `ISC`.
+If needed, add a dedicated `LICENSE` file for explicit repository-level licensing.
+
+---
+
+<div align="center">
+
+### Built for focused writing, visual thinking, and real-time teamwork.
+
+</div>
+>>>>>>> f14bebcb1a933c6c200cd00732168315ac2ec9fd
