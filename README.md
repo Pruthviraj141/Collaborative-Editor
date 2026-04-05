@@ -179,7 +179,7 @@ npm run collab:start
 
 ## 🤖 AI Used
 
-This project README was created with help from **Codex**.
+This project was created with help from **Codex**.
 
 ---
 
