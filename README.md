@@ -1,221 +1,124 @@
-<div align="center">
+# WriterFlow
 
-<img src="https://capsule-render.vercel.app/api?type=waving&height=220&color=0:0ea5e9,100:8b5cf6&text=WriterFlow&fontColor=ffffff&fontSize=54&fontAlignY=38&desc=Collaborative%20Writing%20%2B%20AI%20Diagrams&descAlignY=58&animation=fadeIn" alt="WriterFlow banner" />
+WriterFlow is a collaborative document editor built for teams that want writing, diagramming, and real-time editing in one place. It combines a Tiptap-based writing experience with Excalidraw blocks, Yjs sync, and AI-assisted diagram generation.
 
-<p>
-  <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=20&pause=1200&color=38BDF8&center=true&vCenter=true&width=780&lines=Real-time+collaborative+editor;AI-powered+diagram+generation;Next.js+%2B+Yjs+%2B+Hocuspocus+%2B+Supabase" alt="Typing intro" />
-</p>
+## Live Demo
 
-<p>
-  <img src="https://img.shields.io/badge/Next.js-14-black?logo=next.js" alt="Next.js" />
-  <img src="https://img.shields.io/badge/React-18-149eca?logo=react" alt="React" />
-  <img src="https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Tiptap-Editor-8b5cf6" alt="Tiptap" />
-  <img src="https://img.shields.io/badge/Yjs-Realtime-16a34a" alt="Yjs" />
-  <img src="https://img.shields.io/badge/Supabase-Backend-3ecf8e?logo=supabase&logoColor=white" alt="Supabase" />
-  <img src="https://img.shields.io/badge/Docker-Ready-2496ed?logo=docker&logoColor=white" alt="Docker" />
-</p>
+**Production URL:** https://pruthvi.tech
 
-</div>
+The app is live and actively deployed.
 
----
+## What this project does
 
-## ✨ Overview
+WriterFlow is designed to reduce context-switching during drafting and planning. Instead of moving between a text editor, whiteboard tool, and chat thread, teams can:
 
-**WriterFlow** is a modern collaborative writing platform built for fast drafting, live multi-user editing, and diagram-driven communication.
+- write and structure documents,
+- add or generate diagrams inline,
+- collaborate with live cursors and presence,
+- and keep everything persisted in a single workflow.
 
-It combines:
-- a rich editor experience,
-- real-time presence and synchronization,
-- AI diagram generation,
-- and production-ready deployment with Docker + Nginx.
+## Features
 
----
+- **Real-time collaboration:** multi-user editing with live presence and collaborative cursors.
+- **Rich text editing:** headings, lists, code blocks, quotes, and formatting controls.
+- **Inline diagrams:** Excalidraw canvas blocks inside documents.
+- **AI diagram generation:** convert natural language prompts into structured diagram elements.
+- **Authentication and protected routes:** user sessions and access control for document actions.
+- **Document workflow:** create, list, open, edit, save, share links, and PDF export.
+- **Responsive UI with motion:** animated hero/landing interactions, smooth transitions, and a polished editing experience.
 
-## 🎬 Animated Walkthrough (replace with your own GIFs)
+## Animations and UI direction
 
-> Drop your recordings in `docs/assets/` and keep these names to make this section live.
+The current interface already uses motion and transition effects across landing and editor surfaces to keep interactions clear and modern. There is room to push this further with:
 
-<div align="center">
+- more micro-interactions for toolbar/document actions,
+- smoother section-to-section transitions,
+- and richer visual feedback for collaboration states.
 
-| Flow | Preview |
-|------|---------|
-| Dashboard to document creation | <img src="docs/assets/01-create-document.gif" width="420" alt="Create document demo" /> |
-| Real-time collaboration + presence | <img src="docs/assets/02-collaboration.gif" width="420" alt="Collaboration demo" /> |
-| AI prompt to generated diagram | <img src="docs/assets/03-ai-diagram.gif" width="420" alt="AI diagram demo" /> |
-| Export/share flow | <img src="docs/assets/04-export-share.gif" width="420" alt="Export and share demo" /> |
+## Tech Stack
 
-</div>
+### Frontend
+- Next.js 14 (App Router)
+- React 18
+- TypeScript
+- Tailwind CSS
+- Radix UI primitives
 
----
+### Editor and Collaboration
+- Tiptap
+- Yjs
+- Hocuspocus (provider + dedicated collaboration server)
+- Excalidraw
 
-## 🧩 Core Features
+### Backend and Data
+- Next.js route handlers for API endpoints
+- Supabase (Auth + Postgres)
+- Zod validation
+- jose (JWT handling for collaboration tokens)
 
-- **Rich text editor** with formatting, quick insert tools, and writing-focused UI.
-- **Live collaboration** powered by Yjs/Hocuspocus with active collaborator presence.
-- **Embedded diagrams** using Excalidraw-style canvas blocks in documents.
-- **AI diagram generation** from natural-language prompts.
-- **Secure auth flow** for login/signup and protected routes.
-- **Document management** including dashboard listing and editor sessions.
-- **Production deployment path** with Docker Compose, Nginx, and EC2 automation.
+### AI
+- Groq Chat Completions API (configured model support for diagram generation)
 
----
+### Deployment / Infrastructure
+- Docker and Docker Compose
+- Nginx reverse proxy
+- AWS EC2
 
-## 🏗️ Architecture
-
-```text
-Browser (Next.js UI + Tiptap + Excalidraw)
-   │
-   ├── HTTP API (Next.js route handlers)
-   │      └── Supabase (auth, data, persistence)
-   │
-   └── WebSocket (Yjs provider)
-          └── Hocuspocus Collaboration Server
-                 └── Supabase persistence
-```
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|------|------------|
-| Frontend | Next.js 14, React 18, TypeScript, Tailwind CSS |
-| Editor | Tiptap, custom editor extensions |
-| Diagramming | Excalidraw |
-| Collaboration | Yjs, Hocuspocus |
-| Backend/Data | Next.js API routes, Supabase |
-| Auth | Supabase auth + local auth endpoints |
-| Deployment | Docker, Docker Compose, Nginx, EC2 |
-
----
-
-## 🚀 Quick Start (Balanced: Local + Docker)
-
-### Option A — Local development
-
-1) Install dependencies:
-
-```bash
-npm ci
-npm --prefix collaboration-server ci
-```
-
-2) Configure environment files:
-
-- Copy `.env.example` to `.env.local`
-- Copy `collaboration-server/.env.example` to `collaboration-server/.env`
-
-3) Start both services in separate terminals:
-
-```bash
-npm run dev
-```
-
-```bash
-npm run collab:dev
-```
-
-4) Open:
-- App: `http://localhost:3000`
-- Collaboration server: `ws://localhost:1234`
-
----
-
-### Option B — Docker development
-
-1) Prepare env file:
-
-- Copy `.env.example` to `.env.local`
-
-2) Start the dev stack:
-
-```bash
-docker compose -f docker-compose.dev.yml up --build
-```
-
-3) Open:
-- App: `http://localhost:3000`
-- Collaboration server: `ws://localhost:1234`
-
----
-
-## 🔐 Environment
-
-Use these templates:
-- `.env.example` (local/dev)
-- `.env.production.example` (production)
-- `collaboration-server/.env.example` (collab server)
-
-Keep secrets private. Never commit real credentials.
-
----
-
-## 📦 Production Deployment
-
-Production stack includes:
-- `nextjs-app` container
-- `collab-server` container
-- `nginx` reverse proxy + TLS termination
-
-See full guide: **DEPLOYMENT.md**
-
----
-
-## 🧪 Useful Scripts
-
-```bash
-npm run dev
-npm run build
-npm run start
-npm run lint
-npm run typecheck
-npm run collab:dev
-npm run collab:build
-npm run collab:start
-```
-
----
-
-## 🤖 AI Used
-
-This project README was created with help from **Codex**.
-
----
-
-## 📁 Project Structure (high-level)
+## Project Structure
 
 ```text
-app/                    Next.js App Router pages and API routes
-components/             Reusable UI/editor/auth components
-hooks/                  Collaboration/editor/document hooks
-lib/                    Auth, DB, env, collab, diagram, utilities
-collaboration-server/   Hocuspocus/Yjs collaboration backend
-supabase/migrations/    SQL schema and RLS migrations
-nginx/                  Reverse proxy and SSL config
-scripts/                Deployment and server setup scripts
+app/                      Next.js pages, layouts, and API route handlers
+components/               UI, landing, editor, auth, and diagram components
+hooks/                    Collaboration, editor state, and document hooks
+lib/                      Auth, env, db access, diagram/collab utilities
+collaboration-server/     Hocuspocus WebSocket collaboration backend
+supabase/migrations/      Database schema and RLS migrations
+nginx/                    Reverse proxy and SSL configuration
+scripts/                  Deployment/server setup helpers
 ```
 
----
+## Local Setup
 
-## 📌 Roadmap Ideas
+If you want to run it locally:
 
-- Version history UI and restore flow
-- More export formats and templates
-- Presence analytics and session replay
-- Better AI diagram style presets
+1. Install dependencies
 
----
+  - `npm ci`
+  - `npm --prefix collaboration-server ci`
 
-## 📝 License
+2. Set environment files
 
-Current package license field is `ISC`.
-If needed, add a dedicated `LICENSE` file for explicit repository-level licensing.
+  - copy `.env.example` → `.env.local`
+  - copy `collaboration-server/.env.example` → `collaboration-server/.env`
 
----
+3. Run both services
 
-<div align="center">
+  - `npm run dev`
+  - `npm run collab:dev`
 
-### Built for focused writing, visual thinking, and real-time teamwork.
+4. Open `http://localhost:3000`
 
-</div>
+## Deployment
+
+Production is deployed on **AWS EC2** with a containerized setup:
+
+- Next.js application container
+- dedicated collaboration server container (Hocuspocus/Yjs)
+- Nginx in front for routing and TLS termination
+
+Deployment-related files are included in this repository (`Dockerfile`, `docker-compose.yml`, `nginx/`, and CI workflow assets).
+
+## Future Improvements
+
+- Expand animation consistency across dashboard and editor states.
+- Add deeper performance optimizations for large collaborative documents.
+- Improve version/history UX and restore experience.
+- Extend AI diagram controls (style presets, layout modes, refinements).
+
+## Development Notes
+
+Some parts of this project were built with assistance from **Codex** during development.
+
+## License
+
+Package metadata currently uses the **ISC** license.
